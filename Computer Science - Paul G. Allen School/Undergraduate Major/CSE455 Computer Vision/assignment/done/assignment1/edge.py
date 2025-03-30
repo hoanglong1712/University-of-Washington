@@ -30,7 +30,14 @@ def conv(image, kernel):
     ### YOUR CODE HERE
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    flip = np.flipud(np.fliplr(kernel))
+
+    for i in range (Hi):
+        for j in range (Wi):
+            roi = padded[i:i + Hk, j: j + Wk]            
+            out[i,j] = np.sum(roi * flip)
+            pass
+        pass
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ### END YOUR CODE
@@ -59,13 +66,22 @@ def gaussian_kernel(size, sigma):
     ### YOUR CODE HERE
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    k = (size - 1) / 2
+    sigma_2 = sigma ** 2
+    sigma_2_2 = 2 * sigma_2
+    const = 1 / (np.pi * sigma_2_2)
+    
+    for i in range(size):
+        for j in range (size):
+            kernel[i, j] = const * np.exp(-( (i - k) ** 2 + (j-k)** 2 ) / sigma_2_2)
+            pass
+        pass
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ### END YOUR CODE
 
     return kernel
-
+from scipy.signal import convolve2d
 def partial_x(img):
     """ Computes partial x-derivative of input img.
 
@@ -83,7 +99,11 @@ def partial_x(img):
     ### YOUR CODE HERE
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    D_x = np.array([[-1, 0, 1], 
+                    [-2, 0, 2], 
+                    [-1, 0, 1]])
+    out = conv(img, D_x)
+
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ### END YOUR CODE

@@ -99,9 +99,8 @@ def partial_x(img):
     ### YOUR CODE HERE
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    D_x = np.array([[-1, 0, 1], 
-                    [-2, 0, 2], 
-                    [-1, 0, 1]])
+    # simple central difference kernel
+    D_x = np.array([[0.5, 0, -0.5]])
     out = conv(img, D_x)
 
 
@@ -127,7 +126,9 @@ def partial_y(img):
     ### YOUR CODE HERE
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    # simple central difference kernel
+    D_y = np.array([[0.5], [0], [-0.5]])
+    out = conv(img, D_y)
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ### END YOUR CODE
@@ -155,7 +156,11 @@ def gradient(img):
     ### YOUR CODE HERE
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    G_x = partial_x(img)
+    G_y = partial_y(img)
+
+    G = np.sqrt(np.square(G_x) + np.square(G_y))
+    theta = ((np.arctan2(G_y, G_x) * 360 / np.pi) + 360)% 360
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ### END YOUR CODE

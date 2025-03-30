@@ -141,7 +141,21 @@ def cross_correlation(f, g):
     ### YOUR CODE HERE
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    fh, fw = f.shape
+    gh, gw = g.shape
+
+    pad_height = gh // 2
+    pad_width = gw // 2
+
+    padded = np.pad(f, ((pad_height, pad_height), (pad_width, pad_width)))
+    out = np.zeros((fh, fw))
+
+    for i in range (fh):
+        for j in range (fw):
+            roi = padded[i:i + gh, j: j + gw]            
+            out[i,j] = np.sum(roi * g)
+            pass
+        pass
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ### END YOUR CODE
@@ -167,7 +181,22 @@ def zero_mean_cross_correlation(f, g):
     ### YOUR CODE HERE
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    fh, fw = f.shape
+    gh, gw = g.shape
+
+    pad_height = gh // 2
+    pad_width = gw // 2
+
+    padded = np.pad(f, ((pad_height, pad_height), (pad_width, pad_width)))
+    out = np.zeros((fh, fw))
+    tmp = g - np.mean(g)
+    
+    for i in range (fh):
+        for j in range (fw):
+            roi = padded[i:i + gh, j: j + gw]            
+            out[i,j] = np.sum(roi * tmp)  
+            pass
+        pass
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ### END YOUR CODE
@@ -195,7 +224,26 @@ def normalized_cross_correlation(f, g):
     ### YOUR CODE HERE
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    fh, fw = f.shape
+    gh, gw = g.shape
+
+    pad_height = gh // 2
+    pad_width = gw // 2
+
+    
+    out = np.zeros((fh, fw))
+    g_ = (g - np.mean(g)) / np.std(g)
+    #f_ = f - np.mean(f) / np.std(f)
+    padded = np.pad(f, ((pad_height, pad_height), (pad_width, pad_width)))
+    
+    for i in range (fh):
+        for j in range (fw):
+            # patch image at (n,m)
+            roi = padded[i:i + gh, j: j + gw] 
+            roi_ = (roi - np.mean(roi)) / np.std(roi)
+            out[i,j] = np.sum(roi_ * g_)  
+            pass
+        pass
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ### END YOUR CODE

@@ -1,3 +1,5 @@
+cần giải nén 2 file zip gt.zip và objects.zip trong thư mục images
+
 ## Assignment Instructions
 Details about this assignment can be found [on the course webpage](https://courses.cs.washington.edu/courses/cse455/24sp/assignments/) for Spring '24, under Assignment 1.
 

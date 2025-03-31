@@ -160,7 +160,8 @@ def gradient(img):
     G_y = partial_y(img)
 
     G = np.sqrt(np.square(G_x) + np.square(G_y))
-    theta = ((np.arctan2(G_y, G_x) * 360 / np.pi) + 360)% 360
+    theta = (np.arctan2(G_y, G_x) * 360 / np.pi + 360) % 360
+    
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ### END YOUR CODE
@@ -192,10 +193,42 @@ def non_maximum_suppression(G, theta):
     ### BEGIN YOUR CODE
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    theta = (np.round(theta / 45) * 45) % 180
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ### END YOUR CODE
+
+    for y in range (1, H - 1):
+        for x  in range (1, W - 1):
+            direction = theta[y, x]
+            if direction == 0:
+                n1 = G[y, x - 1]
+                n2 = G[y, x + 1]
+                pass
+            elif direction == 45:
+                n1 = G[y-1, x + 1]
+                n2 = G[y+1, x - 1]
+                pass
+            elif direction == 90:
+                n1 = G[y-1, x]
+                n2 = G[y+1, x]
+                pass
+            elif direction == 135:
+                n1 = G[y-1, x - 1]
+                n2 = G[y+1, x + 1]
+                pass
+            else:
+                continue
+                pass
+            if G[y, x] >= n1 and  G[y, x] >= n2:
+                out[y,x] = G[y, x]
+                pass
+            else:
+                out[y,x] = 0
+                pass
+            pass
+
+        pass
 
     return out
 
@@ -221,7 +254,14 @@ def double_thresholding(img, high, low):
     ### YOUR CODE HERE
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    # Determine strong edges: pixels with intensity greater than the high threshold.
+
+    strong_edges = img > high
+
+    # Determine weak edges: pixels that are not strong and have intensity above the low threshold.
+    # The condition is: low < pixel intensity <= high.
+    weak_edges = (img <= high) & (img > low)
+
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ### END YOUR CODE
@@ -283,8 +323,24 @@ def link_edges(strong_edges, weak_edges):
 
     ### YOUR CODE HERE
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
+    from collections import deque
 
-    pass
+    neighbor_offsets = [(-1, -1), (-1, 0), (-1, 1),
+                        (0, -1),          (0, 1),
+                        (1, -1),  (1, 0), (1, 1)]
+
+    queue = deque(np.argwhere(strong_edges))  # Queue initialized with strong edges' coordinates
+
+    while queue:
+        y, x = queue.popleft()  # Get the current pixel coordinates
+        
+        for dy, dx in neighbor_offsets:
+            ny, nx = y + dy, x + dx  # Neighbor's coordinates
+            
+            # Ensure the neighbor is within bounds and is a weak edge
+            if 0 <= ny < H and 0 <= nx < W and weak_edges[ny, nx] and not edges[ny, nx]:
+                edges[ny, nx] = True  # Link the weak edge
+                queue.append((ny, nx))  # Add the linked weak edge to the queue
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ### END YOUR CODE
@@ -306,7 +362,13 @@ def canny(img, kernel_size=5, sigma=1.4, high=20, low=15):
     ### YOUR CODE HERE
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    kernel = gaussian_kernel(kernel_size, sigma)
+    smoothed = conv(img, kernel)
+    G, theta = gradient(smoothed)
+    nms = non_maximum_suppression(G, theta)
+
+    strong_edges, weak_edges = double_thresholding(nms, high, low)
+    edge = link_edges(strong_edges, weak_edges)
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ### END YOUR CODE
@@ -350,7 +412,16 @@ def hough_transform(img):
     ### YOUR CODE HERE
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    # Transform each point (x, y) into Hough space
+
+    for x, y in zip(xs, ys):
+        for t_idx, (cos_theta, sin_theta) in enumerate(zip(cos_t, sin_t)):
+            # Compute rho using the Hough transform equation
+            rho = x * cos_theta + y * sin_theta
+            # Find the nearest rho index
+            rho_idx = int(np.round(rho + diag_len))
+            accumulator[rho_idx, t_idx] += 1  # Increment accumulator at (rho_idx, t_idx)
+
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ### END YOUR CODE
